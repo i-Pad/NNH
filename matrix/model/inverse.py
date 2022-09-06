@@ -4,6 +4,7 @@ import torch.nn as nn
 import torch.optim as optim
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
+import custom
 
 from numpy.linalg import inv, det
 from tqdm import tqdm
@@ -11,34 +12,59 @@ from time import sleep
 from torch.utils.data import TensorDataset
 from torch.utils.data import DataLoader
 
+
 class Inverse(nn.Module):
 	def __init__(self):
 		super(Inverse, self).__init__()
-		self.conv1 = nn.Conv1d(in_channels=2, out_channels=32, kernel_size=3, padding=1)
+		self.dense1 = nn.Linear(16, 4)
+		#self.dense1 = nn.Linear(10, 16)
+		self.dense2 = nn.Linear(16, 32)
+		self.dense3 = nn.Linear(32, 64)
+		self.dense4 = nn.Linear(64, 32)
+		self.dense5 = nn.Linear(32, 16)
+		self.dense6 = nn.Linear(16, 4)
+		self.custom1 = custom.multiply()
+		#self.conv1 = nn.Conv1d(in_channels=2, out_channels=32, kernel_size=3, padding=1)
+		self.conv1 = nn.Conv1d(in_channels=10, out_channels=32, kernel_size=3, padding=1)
 		self.conv2 = nn.Conv1d(in_channels=32, out_channels=64, kernel_size=3, padding=1)
 		self.conv3 = nn.Conv1d(in_channels=64, out_channels=16, kernel_size=3, padding=1)
 		self.maxp1 = nn.MaxPool1d(3, stride=1, padding=1)
-		self.dense1 = nn.Linear(16, 2)
+
 
 	def forward(self, X):
-		#print('before start:', X.shape)
-		X = F.relu(self.conv1(X))
-		#print('after conv1:', X.shape)
-		X = F.relu(self.conv2(X))
-		#print('after conv2:', X.shape)
-		X = self.maxp1(X)
-		#print('after pooling:', X.shape)
-		X = F.relu(self.conv3(X))
-		#print('after conv3:', X.shape)
-		X = self.maxp1(X)
-		#print('after pooling:', X.shape)
-		X = torch.flatten(X)
-		X = X.view(-1, 16)
-		#print('after flatten:', X.shape)
+		'''
+		#print('before custom1:', X.shape)
+		X = self.custom1(X)
+		#print('after custom1:', X.shape)
+		X = X.view(-1, 10)
+		#print('before dense1:', X.shape)
 		X = self.dense1(X)
-		#print('after dense:', X.shape)
+		#print('after dense1:', X.shape)
+		#X = self.dense2(X)
+		#print('after dense2:', X.shape)
+		#X = self.dense3(X)
+		#print('after dense3:', X.shape)
+		#X = self.dense4(X)
+		#print('after dense4:', X.shape)
+		#X = self.dense5(X)
+		#print('after dense5:', X.shape)
+		X = self.dense6(X)
+		#print('after dense6:', X.shape)
 		X = X.view(-1, 2, 2)
 		#print('final:', X.shape)
+		'''
+
+		X = self.custom1(X)
+		#print('start:', X.shape)
+		X = F.relu(self.conv1(X))
+		X = F.relu(self.conv2(X))
+		X = self.maxp1(X)
+		X = F.relu(self.conv3(X))
+		X = self.maxp1(X)
+		X = torch.flatten(X)
+		X = X.view(-1, 16)
+		X = self.dense1(X)
+		X = X.view(-1, 2, 2)
 
 		return X
 
@@ -86,6 +112,7 @@ def main():
 			break
 
 		A = np.random.randint(50, size=(2, 2))
+		#A = np.random.randn(2, 2)
 		if det(A) == 0:
 			continue
 		else:
@@ -121,6 +148,7 @@ def main():
 	sample_data = torch.randn(1, 2, 2)
 	sample_data = sample_data.to(device)
 	output = model(sample_data)
+	print(sample_data)
 	print(output)
 
 	#dataset = TensorDataset(X_train, y_train)
@@ -143,8 +171,8 @@ def main():
 				#X_tt = X_t[i].reshape(1, 4, 1)
 				pred = model(X_t)
 
-				#cost = F.mse_loss(pred, y_t)
-				cost = my_loss(pred, y_t)
+				cost = F.mse_loss(pred, y_t)
+				#cost = my_loss(pred, y_t)
 
 				optimizer.zero_grad()
 				cost.backward()
@@ -160,10 +188,10 @@ def main():
 	plt.xlabel('Epoch')
 	plt.ylabel('loss')
 	plt.legend()
-	plt.savefig('inverse_det.png')
+	plt.savefig('inverse_det_mul_conv.png')
 	plt.show()
 
-	torch.save(model, 'inverse_det.pt')
+	torch.save(model, 'inverse_det_mul_conv.pt')
 
 if __name__ == '__main__':
 	main()
