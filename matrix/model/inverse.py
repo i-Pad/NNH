@@ -16,8 +16,8 @@ from torch.utils.data import DataLoader
 class Inverse(nn.Module):
 	def __init__(self):
 		super(Inverse, self).__init__()
-		self.dense1 = nn.Linear(16, 4)
-		#self.dense1 = nn.Linear(10, 16)
+		#self.dense1 = nn.Linear(16, 4)
+		self.dense1 = nn.Linear(10, 16)
 		self.dense2 = nn.Linear(16, 32)
 		self.dense3 = nn.Linear(32, 64)
 		self.dense4 = nn.Linear(64, 32)
@@ -32,30 +32,27 @@ class Inverse(nn.Module):
 
 
 	def forward(self, X):
-		'''
 		#print('before custom1:', X.shape)
-		X = self.custom1(X)
+		X = F.relu(self.custom1(X))
 		#print('after custom1:', X.shape)
 		X = X.view(-1, 10)
 		#print('before dense1:', X.shape)
 		X = self.dense1(X)
 		#print('after dense1:', X.shape)
-		#X = self.dense2(X)
+		X = self.dense2(X)
 		#print('after dense2:', X.shape)
-		#X = self.dense3(X)
+		X = self.dense3(X)
 		#print('after dense3:', X.shape)
-		#X = self.dense4(X)
+		X = self.dense4(X)
 		#print('after dense4:', X.shape)
-		#X = self.dense5(X)
+		X = self.dense5(X)
 		#print('after dense5:', X.shape)
 		X = self.dense6(X)
 		#print('after dense6:', X.shape)
 		X = X.view(-1, 2, 2)
 		#print('final:', X.shape)
 		'''
-
-		X = self.custom1(X)
-		#print('start:', X.shape)
+		X = F.relu(self.custom1(X))
 		X = F.relu(self.conv1(X))
 		X = F.relu(self.conv2(X))
 		X = self.maxp1(X)
@@ -65,6 +62,7 @@ class Inverse(nn.Module):
 		X = X.view(-1, 16)
 		X = self.dense1(X)
 		X = X.view(-1, 2, 2)
+		'''
 
 		return X
 
@@ -151,8 +149,8 @@ def main():
 	print(sample_data)
 	print(output)
 
-	#dataset = TensorDataset(X_train, y_train)
-	dataset = TensorDataset(X_train, det_train)
+	dataset = TensorDataset(X_train, y_train)
+	#dataset = TensorDataset(X_train, det_train)
 
 	dataloader = DataLoader(dataset, batch_size=128, shuffle=True)
 	optimizer = optim.Adam(model.parameters(), lr=0.001)
@@ -188,10 +186,10 @@ def main():
 	plt.xlabel('Epoch')
 	plt.ylabel('loss')
 	plt.legend()
-	plt.savefig('inverse_det_mul_conv.png')
+	plt.savefig('inverse_mse_mul_fc.png')
 	plt.show()
 
-	torch.save(model, 'inverse_det_mul_conv.pt')
+	torch.save(model, 'inverse_mse_mul_fc.pt')
 
 if __name__ == '__main__':
 	main()

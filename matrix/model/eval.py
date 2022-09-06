@@ -10,6 +10,16 @@ def main():
 	sample_input = sample_input.type(torch.float)
 	sample_input = sample_input.to(device)
 	print(summary.summary(mul, sample_input, show_input=True))
+
+	pred = mul(sample_input)
+	pred = pred.reshape(2, 2)
+	sample_input = sample_input.reshape(2, 2)
+	print('input')
+	print(sample_input)
+	print('prediction')
+	print(pred)
+	print('answer')
+	print(torch.inverse(sample_input))
 	'''
 	origin = torch.load('mse_inverse.pt')
 	biloss = torch.load('bi_inverse_det.pt')

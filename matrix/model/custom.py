@@ -32,8 +32,9 @@ class multiply(nn.Module):
 
 
 def main():
-	#t = torch.FloatTensor([[[1, 2], [3, 4]], [[2, 3], [4, 5]], [[3, 4], [5, 6]]])
-	t = torch.FloatTensor([[[1, 2], [3, 4]], [[2, 3], [4, 5]]])
+	t = torch.FloatTensor([[[1, 2], [3, 4]], [[2, 3], [4, 5]], [[3, 4], [5, 6]]])
+	print(t)
+	#t = torch.FloatTensor([[[1, 2], [3, 4]], [[2, 3], [4, 5]]])
 	#t = torch.FloatTensor([[[1, 2], [3, 4]]])
 	device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
 	print('device name:', device)
@@ -78,6 +79,7 @@ def main():
 	size = int(ele * (ele + 1) / 2)
 	output = output.view(-1, size, 1)
 	print(output.T)
+	print(output)
 	print(output.shape)
 	
 
