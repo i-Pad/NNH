@@ -30,7 +30,6 @@ class multiply(nn.Module):
 
 		return output
 
-
 def main():
 	t = torch.FloatTensor([[[1, 2], [3, 4]], [[2, 3], [4, 5]], [[3, 4], [5, 6]]])
 	print(t)
@@ -47,14 +46,11 @@ def main():
 
 	print('********************')
 
-
 	print(t[0][0])
 	print(t[0][1])
 
-
 	num = t.shape[2]
 	ele = t.shape[1]
-
 
 	for i in range(ele):
 		for j in range(i, ele):
@@ -81,8 +77,6 @@ def main():
 	print(output.T)
 	print(output)
 	print(output.shape)
-	
-
 
 if __name__ == '__main__':
 	main()
