@@ -9,6 +9,10 @@ from torch.nn.init import xavier_uniform_
 from torch.nn.functional import linear
 from torch import sigmoid, tanh
 
+'''
+paper: Neural Arithmetic Logic Units (https://arxiv.org/pdf/1808.00508.pdf)
+'''
+
 class NacCell(nn.Module):
 	def __init__(self, in_shape, out_shape):
 		super().__init__()

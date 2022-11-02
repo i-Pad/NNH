@@ -24,6 +24,7 @@ class NALU(nn.Module):
 	def forward(self, X):
 		#X = torch.cat([self.nalu1(X), self.nalu2(X)], dim=1)
 		X = self.nalu1(X)
+		#X = self.nalu3(torch.cat([self.nalu1(X), self.nalu2(X)], dim=1))
 		#X = self.nalu2(X)
 		X = self.dense1(X)
 		X = X.squeeze()
