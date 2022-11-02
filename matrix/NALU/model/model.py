@@ -17,13 +17,16 @@ class NALU(nn.Module):
 	def __init__(self):
 		super(NALU, self).__init__()
 		self.nalu1 = nalu.NaluLayer(input_shape=4, output_shape=2, n_layers=2, hidden_shape=4)
-		self.nalu2 = nalu.NaluLayer(input_shape=2, output_shape=1, n_layers=1, hidden_shape=2)
+		#self.nalu2 = nalu.NaluLayer(input_shape=2, output_shape=1, n_layers=1, hidden_shape=2)
 		#self.nalu3 = nalu.NaluLayer(input_shape=2, output_shape=1, n_layers=4, hidden_shape=2)
+		self.dense1 = nn.Linear(2, 1)
 
 	def forward(self, X):
 		#X = torch.cat([self.nalu1(X), self.nalu2(X)], dim=1)
 		X = self.nalu1(X)
-		X = self.nalu2(X)
+		#X = self.nalu2(X)
+		X = self.dense1(X)
+		X = X.squeeze()
 
 		return X
 
@@ -108,7 +111,7 @@ def main():
 	dataloader = DataLoader(dataset, batch_size=b_size, shuffle=True)
 	optimizer = optim.Adam(model.parameters(), lr=0.001)
 
-	epochs = 1000
+	epochs = 100
 	cur_loss = 0.0
 	epos = []
 	los = []
@@ -141,10 +144,10 @@ def main():
 	plt.xlabel('Epoch')
 	plt.ylabel('loss')
 	plt.legend()
-	plt.savefig('get_det_with_nalus_1000.png')
+	plt.savefig('get_det_with_nalu_and_linear.png')
 	plt.show()
 
-	torch.save(model, 'get_det_with_nalus_1000.pt')
+	torch.save(model, 'get_det_with_nalu_and_linear.pt')
 
 if __name__=='__main__':
 	main()
