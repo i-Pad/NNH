@@ -33,7 +33,7 @@ class NacCell(nn.Module):
 		W = tanh(self.W_) * sigmoid(self.M_)
 
 		# linear: XW^T + b
-		return linear(X, W.T, self.bias)
+		return linear(X, W, self.bias)
 		#return torch.matmul(X, W.T)
 
 class NaluCell(nn.Module):
@@ -43,7 +43,7 @@ class NaluCell(nn.Module):
 		self.out_shape = out_shape
 
 		self.G = Parameter(Tensor(out_shape, in_shape))
-		self.nac = NacCell(out_shape, in_shape)
+		self.nac = NacCell(in_shape, out_shape)
 
 		xavier_uniform_(self.G)
 		# epsilon prevents log0
