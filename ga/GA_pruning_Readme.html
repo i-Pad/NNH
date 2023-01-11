@@ -1,0 +1,43 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <meta http-equiv="Content-Style-Type" content="text/css">
+  <title></title>
+  <meta name="Generator" content="Cocoa HTML Writer">
+  <meta name="CocoaVersion" content="2113.3">
+  <style type="text/css">
+    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Helvetica Neue'}
+    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Helvetica Neue'; min-height: 16.0px}
+    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Apple SD Gothic Neo'}
+    p.p4 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Helvetica Neue'; color: #000000}
+    p.p5 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Helvetica Neue'; color: #000000; min-height: 16.0px}
+    p.p6 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Apple SD Gothic Neo'; color: #000000}
+    p.p7 {margin: 0.0px 0.0px 0.0px 0.0px; font: 14.0px 'Apple SD Gothic Neo'; color: #000000; min-height: 17.0px}
+    span.s1 {font: 14.0px 'Apple SD Gothic Neo'}
+    span.s2 {font: 14.0px 'Helvetica Neue'}
+  </style>
+</head>
+<body>
+<p class="p1">#<span class="s1">필터</span> <span class="s1">제거</span> <span class="s1">후</span> accuracy <span class="s1">출력하는</span> <span class="s1">코드</span><span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="s1">데이터셋은</span> Imagenet -&gt; Mnist -&gt; Cifar10 <span class="s1">사용했고</span>, Imagenet -&gt; Mnist <span class="s1">학습된</span> <span class="s1">모델은</span> 228 <span class="s1">서버</span> rlaalsrl9876 <span class="s1">폴더에서</span> model2.h5<span class="s1">로</span> <span class="s1">저장해놨어</span>. <span class="s1">터미널에서</span> <span class="s1">다음</span> <span class="s1">코드</span> <span class="s1">입력하면</span> <span class="s1">될거야</span>:</p>
+<p class="p2"><br></p>
+<p class="p1">python3 -c 'from GA_pruning_paper import *; n2_model = load_(); accuracy2(n2_model, filter, conv_layer)'<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p1"><span class="s1">여기서</span> filter<span class="s1">은</span> 1,2,3,4<span class="s1">번째</span> <span class="s1">필터</span> <span class="s1">유지하고</span> <span class="s1">싶으면</span> [1,2,3,4]<span class="s1">로</span> <span class="s1">넣고</span>, conv_layer<span class="s1">은</span> 0,1,4,5,8,9,10,13,14,15,18,19,20 <span class="s1">이</span> <span class="s1">중에서</span> <span class="s1">넣으면</span> <span class="s1">돼</span> (<span class="s1">우린</span> VGG <span class="s1">사용해서</span> conv layer <span class="s1">총</span> 13<span class="s1">개</span>)</p>
+<p class="p2"><br></p>
+<p class="p1"><span class="s1">예시</span>: python3 -c 'from GA_pruning_paper import *; n2_model = load_(); accuracy2(n2_model, [1,2,3,4], 0)'<span class="Apple-converted-space"> </span></p>
+<p class="p2"><br></p>
+<p class="p3">그리고<span class="s2"> </span>첫번째층<span class="s2"> </span>동결시키고<span class="s2"> </span>모델<span class="s2"> </span>저장하고<span class="s2"> </span>싶으면<span class="s2">:</span></p>
+<p class="p2"><br></p>
+<p class="p4">python3 -c 'from GA_pruning_paper import *; n2_model = load_(); save_(accuracy2(n2_model, [1,2,3,4], 0))’</p>
+<p class="p5"><br></p>
+<p class="p6">그 다음 층에선 그럼 load를 수정해서:</p>
+<p class="p7"><br></p>
+<p class="p4">python3 -c 'from GA_pruning_paper import *; n2_model = load_checkpoint_(); accuracy2(n2_model, [5,6,7,8], 1))'</p>
+<p class="p5"><br></p>
+<p class="p7"><br></p>
+<p class="p6">이렇게 하면 될 거야. ipynb 파일을 원하거나 다른 요청 사항 있으면 얘기해줘!</p>
+</body>
+</html>
