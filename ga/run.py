@@ -19,6 +19,8 @@ def cost(m, s, flag):
 		if s[i] == '1':
 			filters.append(i)
 
+	print(filters)
+
 	return model.accuracy2(m, filters, conv_layer, flag) if flag == 1 else model.accuracy2(m, filters, conv_layer, flag)[1]
 
 def main():
@@ -117,16 +119,16 @@ def main():
 				par2 -= 1
 
 			# crossover
-			#temp_string = ga.OneCrossover(population[par1][0], population[par2][0])
+			temp_string = ga.OneCrossover(population[par1][0], population[par2][0])
 			#temp_string = ga.MultiCrossover(population[par1][0], population[par2][0])
-			temp_string = ga.UniformCrossover(population[par1][0], population[par2][0])
+			#temp_string = ga.UniformCrossover(population[par1][0], population[par2][0])
 
 			# mutation
-			#if random.uniform(0, 1) < constant.MUTATION_RATE: 
-				#temp_string = ga.OneMutation(temp_string)
-			temp_string = ga.UniformMutation(temp_string)
+			if random.uniform(0, 1) < constant.MUTATION_RATE: 
+				temp_string = ga.OneMutation(temp_string)
+			#temp_string = ga.UniformMutation(temp_string)
 
-			children.append((temp_string, cost(Model, temp_string)))
+			children.append((temp_string, cost(Model, temp_string, 0)))
 
 		# replace
 		for i in range(constant.COEF_GEN):
@@ -135,8 +137,7 @@ def main():
 		generation += 1
 		print('generation: ', generation, 'best: ', best)
 
-		#model.save
-
+	model.save_(cost(Model, best, 1))
 
 if __name__ == '__main__':
 	main()
