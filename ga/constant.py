@@ -14,10 +14,10 @@ MAX_P = 100
 MAX_S = 300
 
 # maximum generation
-MAX_G = 1000
+MAX_G = 300
 
 # how much the best one has more chance to be selected
 COEF_SEL = 60
 
 # the number of selections per generation
-COEF_GEN = 3
+COEF_GEN = 10
