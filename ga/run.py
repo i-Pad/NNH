@@ -4,6 +4,7 @@ import constant
 
 import random
 import operator
+import pandas as pd
 
 ######################
 # should change here #
@@ -24,9 +25,11 @@ def cost(m, s, flag):
 	return model.accuracy2(m, filters, conv_layer, flag) if flag == 1 else model.accuracy2(m, filters, conv_layer, flag)[1]
 
 def main():
-	Model = model.load_()
+	Model = model.load_checkpoint_('model3_checkpoint.h5')
 
 	#Model.summary()
+
+	print('for test:', cost(Model, '0000000000000000000000000000000000000000000000000000000000000000', 0))
 
 	# initialize population
 
@@ -59,6 +62,8 @@ def main():
 
 	generation = 1
 	is_same = 0
+
+	res = []
 	while(1):
 		# stop condition: Max generation OR performance isn't improved during MAX_S
 		if generation > constant.MAX_G:
@@ -107,7 +112,6 @@ def main():
 			if par1 == constant.MAX_P:
 				par1 -= 1
 
-
 			fit_sum = 0.0
 			rand_float = random.uniform(0, total_fit)
 			while(par2 < constant.MAX_P):
@@ -136,8 +140,11 @@ def main():
 
 		generation += 1
 		print('generation: ', generation, 'best: ', best)
+		res.append(best)
 
-	model.save_(cost(Model, best, 1))
+	df = pd.DataFrame(res)
+	df.to_csv('conv_layer0.csv', index=False)
+	model.save_(cost(Model, population[0][0], 1))
 
 if __name__ == '__main__':
 	main()
