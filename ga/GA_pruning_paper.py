@@ -22,8 +22,8 @@ from keras.preprocessing.image import ImageDataGenerator
 
 import copy
 
-def save_(n2_model):
-	n2_model.save("model3_checkpoint.h5")
+def save_(n2_model, f_name):
+	n2_model.save(f_name)
 
 
 def load_(f_name='model3.h5'):
@@ -104,9 +104,9 @@ def accuracy2(n2_model, weight_num, num, save, loaded, copied):
 			shear_range=0.15,
 		)
 
-	n2_model.compile(
-		optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
-	)
+		n2_model.compile(
+			optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
+		)
 
 	if save == True:
 		return n2_model

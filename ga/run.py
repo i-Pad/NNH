@@ -146,7 +146,7 @@ def main():
 		generation += 1
 		#print('target:', children[0])
 		#print('after:', population[const.MAX_P - 1])
-		#print('generation:', generation, 'best:', best)
+		print('generation:', generation, 'best:', best)
 		res.append(best)
 		avg.append(sum(pair[1] for pair in population) / const.MAX_P)
 
@@ -156,7 +156,7 @@ def main():
 	df_b.to_csv('conv_layer0_best.csv', index=False)
 	df_a = pd.DataFrame(avg)
 	df_a.to_csv('conv_layer0_avg.csv', index=False)
-	model.save_(cost(Model, population[0][0], save=True, loaded=True, copied=True))
+	model.save_(cost(Model, population[0][0], save=True, loaded=True, copied=True), 'conv0-result.h5')
 
 if __name__ == '__main__':
 	main()
