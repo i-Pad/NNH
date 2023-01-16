@@ -8,13 +8,14 @@ UNIFORM = 0.5
 MUTATION_RATE = 0.1
 
 # size of population
-MAX_P = 500
+MAX_P0 = 500
+MAX_P = 100
 
 # maximum non-improvement generation
 MAX_S = 300
 
 # maximum generation
-MAX_G = 1000
+MAX_G = 10
 
 # how much the best one has more chance to be selected
 COEF_SEL = 60

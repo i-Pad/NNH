@@ -58,6 +58,33 @@ def UniformMutation(s):
 
 	return s
 
+def localOptimization(s):
+	cnt = 0
+	idx = []
+	for i in range(len(s)):
+		if s[i] == '1':
+			cnt += 1
+			idx.append(i)
+
+	if cnt >= 30:
+		survive_ratio = cnt * 0.55
+	elif cnt >= 25:
+		survive_ratio = cnt * 0.65
+	elif cnt >= 20:
+		survive_ratio = cnt * 0.75
+	elif cnt >= 16:
+		survive_ratio = cnt * 0.85
+	else:
+		survive_ratio = cnt
+
+	new_str = ''
+	survive = random.sample(idx, int(survive_ratio))
+
+	for i in range(len(s)):
+		new_str += '1' if i in survive else '0'
+
+	return new_str
+
 def main():
 	s1 = 'abcdefgh'
 	s2 = 'ijklmnop'
@@ -74,6 +101,8 @@ def main():
 	print(s7)
 	s8 = UniformMutation(s6)
 	print(s8)
+	s9 = '11110000000000000000111100000000'
+
 
 
 if __name__ == '__main__':
