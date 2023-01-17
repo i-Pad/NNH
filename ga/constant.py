@@ -15,7 +15,7 @@ MAX_P = 100
 MAX_S = 300
 
 # maximum generation
-MAX_G = 10
+MAX_G = 1000
 
 # how much the best one has more chance to be selected
 COEF_SEL = 60
