@@ -93,13 +93,15 @@ def main():
 	conv_layer = input()
 	if conv_layer == '0':
 		MAX_P = const.MAX_P0
+		model_name = 'conv' + conv_layer + 'before.h5'
+		save_name = 'conv' + conv_layer + 'after.h5'
 	else:
 		MAX_P = const.MAX_P
+		model_name = 'conv' + str(int(conv_layer) - 1) + 'after.h5'
+		save_name = 'conv' + conv_layer + 'after.h5'
 
 	global n_conv
 	n_conv, n_filter = get_layer_and_filter(conv_layer)
-	model_name = 'conv' + conv_layer + 'before.h5'
-	save_name = 'conv' + conv_layer + 'after.h5'
 
 	# load model and copy weight
 	Model = load_model(model_name, compile=False)
