@@ -1,5 +1,6 @@
 import ga
 import constant as const
+import data
 
 import random
 import operator
@@ -7,23 +8,9 @@ import pandas as pd
 import pickle
 import copy
 
-import tensorflow as tf
-from tensorflow.python.keras import layers, models, losses
-from tensorflow.keras import datasets
-from keras.models import Sequential, Model
-from keras.layers import Dense, Dropout, Activation, Flatten
-from keras.layers import Conv2D, MaxPooling2D, BatchNormalization
-from keras.callbacks import LearningRateScheduler
-from keras.optimizers import SGD, Adam
-from keras.utils import np_utils
 from keras.models import load_model
-import numpy as np
-import keras
-from scipy.io import loadmat
-from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import LabelBinarizer
-from sklearn.metrics import confusion_matrix
 from keras.preprocessing.image import ImageDataGenerator
+from sklearn.model_selection import train_test_split
 
 # model, string, generation
 def cost(m, s):
@@ -76,7 +63,6 @@ def save_(m, s, name):
 	m.save(name)
 	print('model is saved. terminating program...')
 
-
 def get_layer_and_filter(l):
 	if l == '0':
 		return 1, 64
@@ -89,61 +75,43 @@ def get_layer_and_filter(l):
 	elif l == '4':
 		return 13, 256
 
-def main():
-	conv_layer = input()
+def get_name(conv_layer):
 	if conv_layer == '0':
 		MAX_P = const.MAX_P0
-		model_name = 'conv' + conv_layer + 'before.h5'
-		save_name = 'conv' + conv_layer + 'after.h5'
+		model_name = './result/AlexNet/conv' + conv_layer + '/conv' + conv_layer + 'before.h5'
+		save_name = './result/AlexNet/conv' + conv_layer + '/conv' + conv_layer + 'after.h5'
 	else:
 		MAX_P = const.MAX_P
-		model_name = 'conv' + str(int(conv_layer) - 1) + 'after.h5'
-		save_name = 'conv' + conv_layer + 'after.h5'
+		model_name = './result/AlexNet/conv' + str(int(conv_layer) - 1) + '/conv' + str(int(conv_layer) - 1) + 'after.h5'
+		save_name = './result/AlexNet/conv' + conv_layer + '/conv' + conv_layer + 'after.h5'
+	
+	return MAX_P, model_name, save_name
+
+def main():
+	conv_layer = input()
+
+	MAX_P, model_name, save_name = get_name(conv_layer)
 
 	global n_conv
 	n_conv, n_filter = get_layer_and_filter(conv_layer)
 
 	# load model and copy weight
-	Model = load_model(model_name, compile=False)
+	model = load_model(model_name, compile=False)
 
-	for layer in Model.layers[:]:
+	for layer in model.layers[:]:
 		layer.trainable = False
 
-	w, b = Model.layers[n_conv].get_weights()
+	w, b = model.layers[n_conv].get_weights()
 	global origin_w
 	origin_w = copy.deepcopy(w)
 
-	train_raw = loadmat("train_32x32.mat")
-	test_raw = loadmat("test_32x32.mat")
-
-	# Load images and labels
-	train_images = np.array(train_raw["X"])
-	test_images = np.array(test_raw["X"])
-
-	train_labels = train_raw["y"]
-	test_labels = test_raw["y"]
-
-	train_images = np.moveaxis(train_images, -1, 0)
-	test_images = np.moveaxis(test_images, -1, 0)
-
-	train_images = train_images.astype("float64")
-	test_images = test_images.astype("float64")
-
-	# Convert train and test labels into 'int64' type
-	train_labels = train_labels.astype("int64")
-	test_labels = test_labels.astype("int64")
-
-	train_images /= 255.0
-	test_images /= 255.0
-
-	lb = LabelBinarizer()
-	train_labels = lb.fit_transform(train_labels)
-	test_labels = lb.fit_transform(test_labels)
+	# load data
+	train_images, train_labels = data.load_data()
 
 	global x_val
 	global y_val
 
-	x_train, x_val, y_train, y_val = train_test_split(
+	_, x_val, _, y_val = train_test_split(
 		train_images, train_labels, test_size=0.15, random_state=22
 	)
 
@@ -155,12 +123,9 @@ def main():
 		shear_range=0.15,
 	)
 
-	Model.compile(
+	model.compile(
 		optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
 	)
-
-	#Model.summary()
-	#print('for test:', cost(Model, '0000000000000000000000000000000000000000000000000000000000000000', save=False, loaded=False, copied=False))
 
 	fitness = []
 	totla_fit = 0.0
@@ -183,16 +148,15 @@ def main():
 			temp_string += '1' if i in active else '0'
 
 		pop_string.append(temp_string)
-
 		n_pop += 1
 
-	population = [(p, cost(Model, p)) for p in pop_string]
+	population = [(p, cost(model, p)) for p in pop_string]
 
 	res = []
 	avg = []
 	p_all = []
 	while(1):
-		# stop condition: Max generation OR performance isn't improved during MAX_S
+		# stop condition: Max generation OR no performance improvement during MAX_S
 		if generation > const.MAX_G:
 			break
 
@@ -262,16 +226,12 @@ def main():
 			# local optimization
 			temp_string = ga.localOptimization(temp_string)
 
-			children.append((temp_string, cost(Model, temp_string)))
+			children.append((temp_string, cost(model, temp_string)))
 
-		#print('before:', population[MAX_P - 1])
 		# replace
 		for i in range(const.COEF_GEN):
-			#print(children[i])
 			population[MAX_P - i - 1]  = children[i]
 
-		#print('target:', children[0])
-		#print('after:', population[MAX_P - 1])
 		population = sorted(population, key=operator.itemgetter(1), reverse=True)
 		best = population[0][1]
 
@@ -282,16 +242,15 @@ def main():
 		for i in range(MAX_P):
 			p_all.append(population[i][1])
 
+	##### save result #####
 	population = sorted(population, key=operator.itemgetter(1), reverse=True)
 
-	best_name = './conv' + conv_layer + 'best.pickle'
-	avg_name = './conv' + conv_layer + 'avg.pickle'
-	all_name = './conv' + conv_layer + 'all.pickle'
+	best_name = './result/AlexNet/conv' + conv_layer + '/conv' + conv_layer + 'best.pickle'
+	avg_name = './result/AlexNet/conv' + conv_layer + '/conv' + conv_layer + 'avg.pickle'
+	all_name = './result/AlexNet/conv' + conv_layer + '/conv' + conv_layer + 'all.pickle'
 
 	df_b = pd.DataFrame(res)
-	#df_b.to_csv('conv_layer0_best.csv', index=False)
 	df_a = pd.DataFrame(avg)
-	#df_a.to_csv('conv_layer0_avg.csv', index=False)
 	df_all = pd.DataFrame(p_all)
 	with open(best_name, 'wb') as fb:
 		pickle.dump(df_b, fb, pickle.HIGHEST_PROTOCOL)
@@ -300,22 +259,22 @@ def main():
 	with open(all_name, 'wb') as fall:
 		pickle.dump(df_all, fall, pickle.HIGHEST_PROTOCOL)
 
-
 	ans1 = population[0][0]# string
 	ans2 = population[0][1]# acc
 	ans3 = 0# num of '1's
+
 	for i in range(len(ans1)):
 		if ans1[i] == '1':
 			ans3 += 1
-	ans_name = './conv' + conv_layer + 'answer.txt'
+
+	ans_name = './result/AlexNet/conv' + conv_layer + '/conv' + conv_layer + 'answer.txt'
 	with open(ans_name, 'w') as file:
 		file.write(str(ans3) + '\n')
 		file.write(ans1 + '\n')
 		file.write(str(ans2) + '\n')
 		file.close()
 
-	# save
-	save_(Model, population[0][0], save_name)
+	save_(model, population[0][0], save_name)
 
 if __name__ == '__main__':
 	main()
