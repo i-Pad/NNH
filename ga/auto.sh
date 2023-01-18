@@ -14,7 +14,7 @@ do
 			mkdir ./result/AlexNet/conv$i
 		done
 
-		cp ./data/conv0before.h5 ./result/AlexNet/conv0/.
+		cp ./data/vgg16.h5 ./result/AlexNet/conv0/conv0before.h5
 
 		for((i=0; i<5; i++));
 		do
