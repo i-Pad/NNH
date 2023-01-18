@@ -18,7 +18,7 @@ do
 
 		for((i=0; i<5; i++));
 		do
-			python3 run.py <<< $i
+			python3 run.py $i
 		done
 
 		break

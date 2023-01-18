@@ -8,6 +8,8 @@ import pandas as pd
 import pickle
 import copy
 
+from sys import argv
+
 from keras.models import load_model
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.model_selection import train_test_split
@@ -88,7 +90,7 @@ def get_name(conv_layer):
 	return MAX_P, model_name, save_name
 
 def main():
-	conv_layer = input()
+	conv_layer = argv[1]
 
 	MAX_P, model_name, save_name = get_name(conv_layer)
 
