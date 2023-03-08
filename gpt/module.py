@@ -136,46 +136,62 @@ def subsequent_mask(size):
 	return subsequent_mask == 0
 
 def attention(query, key, value, mask=None, dropout=None):
+	# query, key and value: (n_batches, seq_len, d_k)
+	# mask: (n_batches, seq_len, seq_len)
+
 	d_k = query.size(-1)
-	scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k)
+	scores = torch.matmul(query, key.transpose(-2, -1)) / math.sqrt(d_k) # Q x K^T / sqrt(d_k) -> (n_batches, seq_len, seq_len)
 
 	if mask is not None:
 		scores = scores.masked_fill(mask == 0, -1e9)
 
-	p_attn = scores.softmax(dim=-1)
+	p_attn = scores.softmax(dim=-1) # (n_batches, seq_len, seq_len)
 
 	if dropout is not None:
 		p_attn = dropout(p_attn)
 
-	return torch.matmul(p_attn, value), p_attn
+	return torch.matmul(p_attn, value), p_attn # (n_batches, seq_len, d_k)
 
 class MultiHeadedAttention(nn.Module):
 	def __init__(self, h, d_model, dropout=0.1):
 		super(MultiHeadedAttention, self).__init__()
+		# assumed d_embed equals to d_model because typically it is.
+
 		assert d_model % h == 0
 		self.d_k = d_model // h
 		self.h = h
-		self.linears = stacks(nn.Linear(d_model, d_model), 4)
+		self.linears = stacks(nn.Linear(d_model, d_model), 4) # 3 for query, key and value for each and 1 for output
 		self.attn = None
 		self.dropout = nn.Dropout(p=dropout)
 
 	def forward(self, query, key, value, mask=None):
+		# query, key and value: (n_batches, seq_len, d_model)
+		# mask: (n_batches, seq_len, seq_len)
+
 		if mask is not None:
 			mask = mask.unsqueeze(1)
 
 		n_batches = query.size(0)
 
 		qeury, key, value = [lin(x).view(n_batches, -1, self.h, self.d_k).transpose(1, 2) for lin, x in zip(self.linears, (query, key, value))]
+		# history of above:
+		# (n_batches, seq_len, d_model) (input)
+		# (n_batches, seq_len, h, d_k)
+		# (n_batches, h, seq_len, d_k)
 
 		x, self.attn = attention(qeury, key, value, mask=mask, dropout=self.dropout)
 
 		x = x.transpose(1, 2).contiguous().view(n_batches, -1, self.h * self.d_k)
+		# history of above:
+		# (n_batches, h, seq_len, d_k) (input)
+		# (n_batches, seq_len, h, d_k)
+		# (n_batches, seq_len, d_model)
 
 		del query
 		del key
 		del value
 
-		return self.linears[-1](x)
+		return self.linears[-1](x) # (n_batches, seq_len, d_model)
 
 class PositionwiseFeedForward(nn.Module):
 	def __init__(self, d_model, d_ff, dropout=0.1):
@@ -234,7 +250,6 @@ def make_model(src_vocab, tgt_vocab, N=6, d_model=512, d_ff=2048, h=8, dropout=0
 			nn.init.xavier_uniform_(p)
 
 	return model
-
 
 def main():
 	print('import is done.')
